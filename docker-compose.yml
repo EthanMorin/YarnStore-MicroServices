@@ -1,0 +1,27 @@
+version: "3"
+services:
+  # DataBase
+  database:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: on-failure
+    networks:
+      - yarn_exchange
+  cache:
+    image: redis:latest
+    restart: on-failure 
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning 
+    volumes: 
+      - redis_cache:/data
+
+volumes:
+  mongodb_data: {}
+  redis_cache: {}
+networks:
+  yarn_exchange:
+    driver: bridge
