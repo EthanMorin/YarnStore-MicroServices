@@ -1,0 +1,7 @@
+go 1.22.2
+
+use (
+  ./yarn_cart
+  ./yarn_catalog
+  ./yarn_email
+)
