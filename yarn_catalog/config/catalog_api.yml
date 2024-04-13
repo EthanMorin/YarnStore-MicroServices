@@ -1,16 +1,16 @@
 openapi: 3.0.0
 info:
-  title: Yarn Exchange API - OpenAPI 3.0.0
+  title: Yarn Catalog API - OpenAPI 3.0.0
   version: 1.0.0
 servers:
   - url: 127.0.0.1:8080
 tags:
-  - name: Yarn Catalog
+  - name: Catalog
 paths:
   /catalog:
     get:
       tags:
-        - Yarn Catalog
+        - Catalog
       summary: returns the catalog of all Yarns
       responses:
         "200":
@@ -21,7 +21,7 @@ paths:
                 $ref: "#/components/schemas/Catalog"
     post:
       tags:
-        - Yarn Catalog
+        - Catalog
       summary: Adds a Yarn to the catalog
       requestBody:
         required: true
@@ -41,7 +41,7 @@ paths:
   /catalog/{product_id}:
     get:
       tags:
-        - Yarn Catalog
+        - Catalog
       summary: gets one yarn from the catalog
       parameters:
         - in: path
@@ -61,7 +61,7 @@ paths:
           description: Item not found
     patch:
       tags:
-        - Yarn Catalog
+        - Catalog
       summary: Update the Yarn availability
       parameters:
         - in: path
@@ -81,17 +81,17 @@ paths:
                   type: boolean  
       responses:
         "200":
-          description: User updated successfully.
+          description: Yarn updated successfully.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Yarn"
         "404":
-          description: user not found.
+          description: Yarn not found.
         
     delete:
       tags:
-        - Yarn Catalog
+        - Catalog
       summary: Delete one item in the catalog
       parameters:
         - in: path
