@@ -10,13 +10,15 @@ services:
   #     - yarn_exchange
 
   # Catalog Service
-  # catalog:
-  #   build: ./yarn_catalog
-  #   ports:
-  #     - "8081:8081"
-  #   restart: on-failure
-  #   networks:
-  #     - yarn_exchange
+  catalog:
+    build: ./yarn_catalog
+    ports:
+      - "8081:8081"
+    restart: on-failure
+    depends_on:
+      - mongo
+    networks:
+      - yarn_exchange
 
   # Email Service
   # email:
