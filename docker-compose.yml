@@ -1,33 +1,42 @@
 version: "3"
 services:
+  # Catalog Service
+  # catalog:
+  #   build: ./yarn_catalog
+  #   ports:
+  #     - "8080:8080"
+  #   restart: on-failure
+  #   depends_on:
+  #     - mongo
+  #   networks:
+  #     - yarn_exchange
+
   # Cart Service
   # cart:
   #   build: ./yarn_cart
   #   ports:
-  #     - "8080:8080"
+  #     - "8081:8080"
   #   restart: on-failure
   #   networks:
   #     - yarn_exchange
-
-  # Catalog Service
-  catalog:
-    build: ./yarn_catalog
-    ports:
-      - "8081:8081"
-    restart: on-failure
-    depends_on:
-      - mongo
-    networks:
-      - yarn_exchange
 
   # Email Service
   # email:
   #   build: ./yarn_email
   #   ports:
-  #     - "8082:8082"
+  #     - "8080"
   #   restart: on-failure
   #   networks:
   #     - yarn_exchange
+
+  # apigateway
+  proxy:
+    build: ./yarn_apigateway
+    ports:
+      - "80:80"
+    restart: on-failure
+    networks:
+      - yarn_exchange
 
   # DataBases
   mongo:
