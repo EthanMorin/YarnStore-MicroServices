@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"yarn_catalog/data"
 	"yarn_catalog/models"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,11 @@ func (a *API) DeleteCatalogProductId(c *gin.Context, productId string) {
 
 // GetCatalog implements ServerInterface.
 func (a *API) GetCatalog(c *gin.Context) {
-	panic("unimplemented")
+	results, err := data.GetCatalog()
+	if err != nil {
+		panic(err)
+	}
+	c.JSON(http.StatusOK, &results)
 }
 
 // GetCatalogProductId implements ServerInterface.
@@ -31,13 +36,17 @@ func (a *API) PatchCatalogProductId(c *gin.Context, productId string) {
 
 // PostCatalog implements ServerInterface.
 func (a *API) PostCatalog(c *gin.Context) {
-	var yarn models.PostCatalogJSONRequestBody
-	if err := c.ShouldBindJSON(&yarn); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
-		return 
-	}
-	// TODO add mongo post
-	c.JSON(http.StatusCreated, &yarn)
+	// var yarn models.PostCatalogJSONRequestBody
+	// if err := c.ShouldBindJSON(&yarn); err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	// 	return 
+	// }
+	// result, err := data.PostYarn(&yarn)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	// 	return
+	// }
+	// c.JSON(http.StatusCreated, &result)
 }
 
 func NewAPI() *API {
