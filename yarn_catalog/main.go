@@ -19,5 +19,5 @@ func newServer(catalogApi *api.API) *gin.Engine {
 
 func main() {
 	server := newServer(api.NewAPI())
-	server.Run(":8081")
+	server.Run(":8080")
 }

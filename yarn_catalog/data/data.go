@@ -28,13 +28,15 @@ func yarnCollection() *mongo.Collection {
 	return client.Database("yarn_store").Collection("yarn")
 }
 
-func PostYarn(yarn *models.Yarn) (*mongo.InsertOneResult, error) {
-	result, err := yarnCollection().InsertOne(context.Background(), &yarn)
+func PostYarn[T any](obj *T) (*mongo.InsertOneResult, error) {
+	result, err := yarnCollection().InsertOne(context.Background(), &obj)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
+
+// TODO: Convert to generics
 
 func GetCatalog() (*[]models.Yarn, error) {
 	var catalog []models.Yarn
@@ -49,14 +51,13 @@ func GetCatalog() (*[]models.Yarn, error) {
 }
 
 func GetYarn(objId primitive.ObjectID) (*models.Yarn, error) {
-	var yarn models.Yarn
 	if err := yarnCollection().FindOne(context.Background(), bson.M{"_id": objId}).Decode(&yarn); err != nil {
 		return nil, err
 	}
 	return &yarn, nil
 }
 
-func PatchYarn(objId primitive.ObjectID, yarn models.PatchCartProductIdJSONBody) (*mongo.UpdateResult, error) {
+func PatchYarn[T](objId primitive.ObjectID, yarn models.PatchCartProductIdJSONBody) (*mongo.UpdateResult, error) {
 	result, err := yarnCollection().UpdateOne(context.Background(), bson.M{"_id": objId}, bson.M{"$set": bson.M{"Available": &yarn.Amount}})
 	if err != nil {
 		return nil, err

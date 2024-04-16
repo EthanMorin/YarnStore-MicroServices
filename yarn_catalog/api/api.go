@@ -3,7 +3,6 @@ package api
 import (
 	"net/http"
 	"yarn_catalog/data"
-	"yarn_catalog/models"
 
 	"github.com/gin-gonic/gin"
 )

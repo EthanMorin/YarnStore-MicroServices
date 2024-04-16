@@ -38,6 +38,14 @@ services:
     networks:
       - yarn_exchange
 
+  # Service Regestry
+  registry:
+    image: netflixoss/eureka:latest
+    ports:
+      - "8761:8761"
+    
+
+
   # DataBases
   mongo:
     image: mongo:latest
