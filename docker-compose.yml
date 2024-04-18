@@ -2,9 +2,10 @@ version: "3"
 services:
   # Catalog Service
   catalog:
+    container_name: catalog
     build: ./yarn_catalog
     ports:
-      - "8080:8080"
+      - "8080"
     restart: on-failure
     depends_on:
       - mongo
@@ -12,16 +13,18 @@ services:
       - yarn_exchange
 
   # Cart Service
-  cart:
-    build: ./yarn_cart
-    ports:
-      - "8081:8080"
-    restart: on-failure
-    networks:
-      - yarn_exchange
+  # cart:
+    # container_name: cart
+    # build: ./yarn_cart
+    # ports:
+    #   - "8081:8080"
+    # restart: on-failure
+    # networks:
+    #   - yarn_exchange
 
   # Email Service
   # email:
+  #   container_name: email
   #   build: ./yarn_email
   #   ports:
   #     - "8080"
