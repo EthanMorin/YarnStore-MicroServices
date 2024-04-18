@@ -1,7 +1,9 @@
 package main
 
 import (
+	"yarn_catalog/data"
 	"yarn_catalog/api"
+
 	"github.com/gin-gonic/gin"
 	middleware "github.com/oapi-codegen/gin-middleware"
 )
@@ -18,6 +20,10 @@ func newServer(catalogApi *api.API) *gin.Engine {
 }
 
 func main() {
+	err := data.NewDB()
+	if err != nil {
+		panic(err)
+	}
 	server := newServer(api.NewAPI())
 	server.Run(":8080")
 }

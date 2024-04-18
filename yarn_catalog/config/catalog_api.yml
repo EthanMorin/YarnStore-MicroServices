@@ -28,7 +28,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Yarn"
+              type: object
+              properties: 
+                unit_name:
+                  type: string
+                unit_color:
+                  type: string
+                unit_price:
+                  type: number
+                available:
+                  type: boolean
       responses:
         "201":
           description: Yarn added successfully

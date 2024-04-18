@@ -19,13 +19,21 @@ type Yarn struct {
 	UnitPrice *float32            `json:"unit_price,omitempty"`
 }
 
+// PostCatalogJSONBody defines parameters for PostCatalog.
+type PostCatalogJSONBody struct {
+	Available *bool    `json:"available,omitempty"`
+	UnitColor *string  `json:"unit_color,omitempty"`
+	UnitName  *string  `json:"unit_name,omitempty"`
+	UnitPrice *float32 `json:"unit_price,omitempty"`
+}
+
 // PatchCatalogProductIdJSONBody defines parameters for PatchCatalogProductId.
 type PatchCatalogProductIdJSONBody struct {
 	Available *bool `json:"available,omitempty"`
 }
 
 // PostCatalogJSONRequestBody defines body for PostCatalog for application/json ContentType.
-type PostCatalogJSONRequestBody = Yarn
+type PostCatalogJSONRequestBody PostCatalogJSONBody
 
 // PatchCatalogProductIdJSONRequestBody defines body for PatchCatalogProductId for application/json ContentType.
 type PatchCatalogProductIdJSONRequestBody PatchCatalogProductIdJSONBody
