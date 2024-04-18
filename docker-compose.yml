@@ -1,24 +1,24 @@
 version: "3"
 services:
   # Catalog Service
-  # catalog:
-  #   build: ./yarn_catalog
-  #   ports:
-  #     - "8080:8080"
-  #   restart: on-failure
-  #   depends_on:
-  #     - mongo
-  #   networks:
-  #     - yarn_exchange
+  catalog:
+    build: ./yarn_catalog
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    depends_on:
+      - mongo
+    networks:
+      - yarn_exchange
 
   # Cart Service
-  # cart:
-  #   build: ./yarn_cart
-  #   ports:
-  #     - "8081:8080"
-  #   restart: on-failure
-  #   networks:
-  #     - yarn_exchange
+  cart:
+    build: ./yarn_cart
+    ports:
+      - "8081:8080"
+    restart: on-failure
+    networks:
+      - yarn_exchange
 
   # Email Service
   # email:
@@ -30,20 +30,23 @@ services:
   #     - yarn_exchange
 
   # apigateway
-  proxy:
-    build: ./yarn_apigateway
-    ports:
-      - "80:80"
-    restart: on-failure
-    networks:
-      - yarn_exchange
+  # proxy:
+  #   image: traefik:latest
+  #   command:
+  #     #- "--log.level=DEBUG"
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.web.address=:80"
+  #   ports: 
+  #     - "80:80"
+  #     - "8080:8080"
 
   # Service Regestry
   registry:
-    image: netflixoss/eureka:latest
+    image: steeltoeoss/eureka-server:latest 
     ports:
       - "8761:8761"
-    
 
 
   # DataBases
