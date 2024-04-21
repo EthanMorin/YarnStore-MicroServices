@@ -5,8 +5,8 @@ services:
     container_name: catalog
     build: ./yarn_catalog
     ports:
-      - "8081:8080"
-    restart: on-failure
+      - "8080"
+    restart: always
     depends_on:
       - mongo
       - consul
@@ -20,28 +20,37 @@ services:
 
   # Cart Service
   # cart:
-  # container_name: cart
-  # build: ./yarn_cart
-  # ports:
-  #   - "8082:8080"
-  # restart: on-failure
-  # networks:
-  #   - yarn_exchange
+  #   container_name: cart
+  #   build: ./yarn_cart
+  #   ports:
+  #     - "8080"
+  #   restart: always
+  #   networks:
+  #     - yarn_exchange
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.catalog.rule=PathPrefix(`/cart`)"
+  #     - "traefik.http.routers.catalog.service=cart"
+  #     - "traefik.http.services.catalog.loadbalancer.server.port=8080"
 
   # Email Service
   # email:
   #   container_name: email
   #   build: ./yarn_email
   #   ports:
-  #     - "8083:8080"
-  #   restart: on-failure
+  #     - "8080"
+  #   restart: always
   #   networks:
   #     - yarn_exchange
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.http.routers.catalog.service=email"
 
   # Service Registry
   consul:
     image: hashicorp/consul:latest
     container_name: consul
+    restart: always
     ports:
       - "8500:8500"
     networks:
@@ -49,32 +58,23 @@ services:
     volumes:
       - ./consul/consul.json:/consul/config/consul.json
 
-  # Temp
-  proxy:
-    build: ./nginx
+  # Gateway
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    restart: always
+    command:
+      - --api.insecure=true
+      - --providers.docker
     ports:
       - "80:80"
-    depends_on:
-      - catalog
-    restart: on-failure
+      - "8080:8080"
     networks:
       - yarn_exchange
-
-
-  # Gateway
-  # traefik:
-  #   image: traefik:v2.5
-  #   container_name: traefik
-  #   ports:
-  #     - "80:80"
-  #     - "8080:8080"
-  #   networks:
-  #     - yarn_exchange
-  #   depends_on:
-  #     - consul
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ./traefik/traefik.toml:/etc/traefik/traefik.toml
+    depends_on:
+      - consul
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   # DataBases
   mongo:
@@ -84,17 +84,17 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-    restart: on-failure
+    restart: always
     networks:
       - yarn_exchange
 
   cache:
     image: redis:latest
     container_name: redis
-    restart: on-failure
+    restart: always
     ports:
       - "6379:6379"
-    command: redis-server --save 20 1 --loglevel warning
+    # command: redis-server --save 20 1 --loglevel warning
     volumes:
       - redis_cache:/data
     networks:
@@ -104,6 +104,7 @@ services:
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
+    restart: always
     ports:
       - "5672:5672"
       - "15672:15672"
