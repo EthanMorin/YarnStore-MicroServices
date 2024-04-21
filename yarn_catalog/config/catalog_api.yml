@@ -7,6 +7,12 @@ servers:
 tags:
   - name: Catalog
 paths:
+  /check:
+    get:
+      summary: Check if the service is running
+      responses:
+        "200":
+          description: Service is running
   /catalog:
     get:
       tags:

@@ -1,0 +1,16 @@
+[entryPoints]
+[entryPoints.web]
+address = ":80"
+
+[providers]
+[providers.consul]
+rootKey = "traefik"
+endpoints = ["consul:8500"]
+
+[providers.consul.tls]
+insecureSkipVerify = true
+
+[api]
+dashboard = true
+insecure = true
+debug = true

@@ -11,12 +11,19 @@ import (
 
 type API struct{}
 
+// GetCheck implements ServerInterface.
+func (a *API) GetCheck(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+}
+
 // DeleteCatalogProductId implements ServerInterface.
 func (a *API) DeleteCatalogProductId(c *gin.Context, productId string) {
-	objId, err := primitive.ObjectIDFromHex(productId); if err != nil {
+	objId, err := primitive.ObjectIDFromHex(productId)
+	if err != nil {
 		panic(err)
 	}
-	err = data.DeleteYarn(objId); if err != nil {
+	err = data.DeleteYarn(objId)
+	if err != nil {
 		panic(err)
 	}
 	c.Status(http.StatusNoContent)
@@ -33,7 +40,8 @@ func (a *API) GetCatalog(c *gin.Context) {
 
 // GetCatalogProductId implements ServerInterface.
 func (a *API) GetCatalogProductId(c *gin.Context, productId string) {
-	objId, err := primitive.ObjectIDFromHex(productId); if err != nil {
+	objId, err := primitive.ObjectIDFromHex(productId)
+	if err != nil {
 		panic(err)
 	}
 	result, err := data.GetYarn(objId)
@@ -45,7 +53,8 @@ func (a *API) GetCatalogProductId(c *gin.Context, productId string) {
 
 // PatchCatalogProductId implements ServerInterface.
 func (a *API) PatchCatalogProductId(c *gin.Context, productId string) {
-	objId, err := primitive.ObjectIDFromHex(productId); if err != nil {
+	objId, err := primitive.ObjectIDFromHex(productId)
+	if err != nil {
 		panic(err)
 	}
 	var yarn models.PatchCatalogProductIdJSONBody
@@ -53,7 +62,8 @@ func (a *API) PatchCatalogProductId(c *gin.Context, productId string) {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
-	result, err := data.PatchYarn(objId, &yarn); if err != nil {
+	result, err := data.PatchYarn(objId, &yarn)
+	if err != nil {
 		panic(err)
 	}
 	c.JSON(http.StatusOK, &result)
@@ -61,10 +71,10 @@ func (a *API) PatchCatalogProductId(c *gin.Context, productId string) {
 
 // PostCatalog implements ServerInterface.
 func (a *API) PostCatalog(c *gin.Context) {
-	var yarn models.PostCatalogJSONBody 
+	var yarn models.PostCatalogJSONBody
 	if err := c.ShouldBindJSON(&yarn); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"err": err.Error()})
-		return 
+		return
 	}
 	result, err := data.PostYarn(&yarn)
 	if err != nil {
