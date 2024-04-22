@@ -20,18 +20,27 @@ import (
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Creates a new cart
+	// (POST /cart/new)
+	PostCartNew(c *gin.Context)
+	// Clear the cart
+	// (DELETE /cart/{cart_id})
+	DeleteCartCartId(c *gin.Context, cartId string)
 	// Returns current Yarns in cart
-	// (GET /cart)
-	GetCart(c *gin.Context)
-	// Adds a Yarn to the cart
-	// (POST /cart)
-	PostCart(c *gin.Context)
+	// (GET /cart/{cart_id})
+	GetCartCartId(c *gin.Context, cartId string)
 	// Remove one item in the cart
-	// (DELETE /cart/{product_id})
-	DeleteCartProductId(c *gin.Context, productId string)
+	// (DELETE /cart/{cart_id}/{product_id})
+	DeleteCartCartIdProductId(c *gin.Context, cartId string, productId string)
 	// Update the Yarn quantity
-	// (PATCH /cart/{product_id})
-	PatchCartProductId(c *gin.Context, productId string)
+	// (PATCH /cart/{cart_id}/{product_id})
+	PatchCartCartIdProductId(c *gin.Context, cartId string, productId string)
+	// Adds a Yarn to the cart
+	// (POST /cart/{cart_id}/{product_id})
+	PostCartCartIdProductId(c *gin.Context, cartId string, productId string)
+	// Check if the service is running
+	// (GET /check)
+	GetCheck(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -43,8 +52,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetCart operation middleware
-func (siw *ServerInterfaceWrapper) GetCart(c *gin.Context) {
+// PostCartNew operation middleware
+func (siw *ServerInterfaceWrapper) PostCartNew(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -53,26 +62,70 @@ func (siw *ServerInterfaceWrapper) GetCart(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetCart(c)
+	siw.Handler.PostCartNew(c)
 }
 
-// PostCart operation middleware
-func (siw *ServerInterfaceWrapper) PostCart(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostCart(c)
-}
-
-// DeleteCartProductId operation middleware
-func (siw *ServerInterfaceWrapper) DeleteCartProductId(c *gin.Context) {
+// DeleteCartCartId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCartCartId(c *gin.Context) {
 
 	var err error
+
+	// ------------- Path parameter "cart_id" -------------
+	var cartId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteCartCartId(c, cartId)
+}
+
+// GetCartCartId operation middleware
+func (siw *ServerInterfaceWrapper) GetCartCartId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "cart_id" -------------
+	var cartId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetCartCartId(c, cartId)
+}
+
+// DeleteCartCartIdProductId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCartCartIdProductId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "cart_id" -------------
+	var cartId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	// ------------- Path parameter "product_id" -------------
 	var productId string
@@ -90,13 +143,22 @@ func (siw *ServerInterfaceWrapper) DeleteCartProductId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteCartProductId(c, productId)
+	siw.Handler.DeleteCartCartIdProductId(c, cartId, productId)
 }
 
-// PatchCartProductId operation middleware
-func (siw *ServerInterfaceWrapper) PatchCartProductId(c *gin.Context) {
+// PatchCartCartIdProductId operation middleware
+func (siw *ServerInterfaceWrapper) PatchCartCartIdProductId(c *gin.Context) {
 
 	var err error
+
+	// ------------- Path parameter "cart_id" -------------
+	var cartId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
+		return
+	}
 
 	// ------------- Path parameter "product_id" -------------
 	var productId string
@@ -114,7 +176,53 @@ func (siw *ServerInterfaceWrapper) PatchCartProductId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PatchCartProductId(c, productId)
+	siw.Handler.PatchCartCartIdProductId(c, cartId, productId)
+}
+
+// PostCartCartIdProductId operation middleware
+func (siw *ServerInterfaceWrapper) PostCartCartIdProductId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "cart_id" -------------
+	var cartId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "product_id" -------------
+	var productId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "product_id", c.Param("product_id"), &productId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter product_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostCartCartIdProductId(c, cartId, productId)
+}
+
+// GetCheck operation middleware
+func (siw *ServerInterfaceWrapper) GetCheck(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetCheck(c)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -144,28 +252,31 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/cart", wrapper.GetCart)
-	router.POST(options.BaseURL+"/cart", wrapper.PostCart)
-	router.DELETE(options.BaseURL+"/cart/:product_id", wrapper.DeleteCartProductId)
-	router.PATCH(options.BaseURL+"/cart/:product_id", wrapper.PatchCartProductId)
+	router.POST(options.BaseURL+"/cart/new", wrapper.PostCartNew)
+	router.DELETE(options.BaseURL+"/cart/:cart_id", wrapper.DeleteCartCartId)
+	router.GET(options.BaseURL+"/cart/:cart_id", wrapper.GetCartCartId)
+	router.DELETE(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.DeleteCartCartIdProductId)
+	router.PATCH(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.PatchCartCartIdProductId)
+	router.POST(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.PostCartCartIdProductId)
+	router.GET(options.BaseURL+"/check", wrapper.GetCheck)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/8xVX4vjNhD/KkLto2Nnrwc9/HbtQUkfutuWPhxlWRRp4uiwNTppFDYEf/cysrNJ7IQt",
-	"bRf6JKH5/5vfjA5SY+fRgaMo64OMegudytcfVSA+fUAPgSzkV0vQXV4u5V+TcmRpz3fae5C1tI6ggSD7",
-	"Qu5VcCz5NsBG1vKb6hS9GkNXn1mn74ujOa6/gCZ5elAhqP11jc+j/8uc1E7ZVq1bOEtqjdiCcmzkA5qk",
-	"6cmaM3mkYF0jC/m8aHBhO48jGoq2spYNlh26Bs26xNBU+b4wwe4gVOuIrvLBdpbsDjhC9jE6fhGU9znt",
-	"1accBJW3C40GGnALeKagFqSanD77k7V8sqbAjmH3NJSfnKUnjS2GeeJHsVMd3Jb6YPW52KVuzZ2aY8tP",
-	"1m0wK1tiLDPagmkiPj6sxELce3B8+65clktZyB2EaHPud/mlLyR6cMpbWcujEgOay6z0SLgG8sEdVGTR",
-	"rYys5U9AmZCFDBA9uji09t1yyYdGR+CymfK+tTobVl8yckdWv0a87D8XaiDqYD0Nyf/8+/0vIpNO4EYw",
-	"hWNGKKauU2Eva/kbUAouCp1CAEeCgYnCOqGHlIdO/jmM1CNTDuOVGh8wnor8miDSD2j2/1l942D1g3cb",
-	"wMiaQoJ+hundG8S8xDRTRxkDRsSkNcS4SW27Z4q8H1p6qb9yO9VaI6zziSbofzQmCpVBF4SCtnAD974Y",
-	"SFYdTiPfD7FaIJg35FN+Z+uHwWBlMmOD6oAgsO9poqOisIbJwrnkncfDw8PP26OQw1CeL55pT4ozfCej",
-	"2z/O+vV+DlhGI0CHu6sQ37JwSGKDyZkZw9mTQAeCNxBz+zbOeaj19grB+fl/Cec/m7bJN9NhGqymH9/1",
-	"dfraFC7/RS5v9w3PZ/nXMZZI3iia0K38m3wrJ4T7I/vKHc+KLwXNp5rtIOyOBEqh5R/n3ff8wZR39Yfl",
-	"h6XkLo92hyNfhn3/2P8VAAD//9jOLHIECQAA",
+	"H4sIAAAAAAAC/+xWTW8bOQz9KwJ3j7O2s81pbkELFO4hSRv0EBRBIEu0rXRGUiTKgWH4vxfUOP6asesg",
+	"DdpDD4YFDUk9Pj6RWoBytXcWLUUoFxDVFGuZl+9lIP73wXkMZDDvKhno3mhejl2oJUEJKRkNBdDcI5QQ",
+	"KRg7gWUBhrDOTuvFbqzHJC0ZmvN65Wws4QQDe89lsPzl34BjKOGf/gZpfwWzf8s2y+X6bDd6QEWw2ZAh",
+	"yHm3xe0q/i4mOZOmkqMKt0CNnKtQWnbywemkTmYgWUP3ylUubIXb+2xljYe/+mDU9meb6hHz086It4wd",
+	"u2xsiDPIOQoupLi4Hor/xJVHy6t3vUFvAAXMMETjLJRwlneWBTiPVnoDJTwbeUnTzE2fi9+3+JRpczHL",
+	"g8mTZJwdaijh2kXi8y7xCQoIGL2zsWH2/8FZFpCzhDa7Su8ro7Jz/yE6uxHga3TXzYzGqILx1GSbKVEB",
+	"JaEWMSmFMY5TVTVSiamuZZizXTaJQgqLT4Ix8HlyEqH81lyQO3ZoiFmsMC4ZpMYKCdsEfcj77Mq/oc78",
+	"BlkjYeCoCzAMkDmHAhptrJNnRh+TCaihpJCw2KJrn4W7Fv3nDa42DxXK8BMe2ETQFA9wUMAEO9TwEelY",
+	"ph1YcpJvxsDgRQI81nhy3h3C+nRzdSly0xFuLLiFxT0qvyClYKNQKQS0JPiKRmHsyerqLzZN6EVSu27c",
+	"fkMlik5Vb/XSXy7s3PgC1m7WEnYB5wc9rCMxdsnqVtE4knAWBc8yLtexy+AlqWlHc+TtP6QeuyesoAij",
+	"WbacWp6+xZuWbfCKcfB2T4f2nf68Okskr1sDo3eioHp7ivqaY2Wqs+E6oS45HR21f8X08rfFCcJoySCX",
+	"SWrd2VAG7foP7UxWRgtjfaK96l9ozY+KHJLckV6S2/8U1XeOf3DGZoPu+7WL6QbDzCgUJoqQrH1+L20N",
+	"eg4lTFO22GW9XGNcPBexGYZ3yx8BAAD//xkuTiBNDAAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

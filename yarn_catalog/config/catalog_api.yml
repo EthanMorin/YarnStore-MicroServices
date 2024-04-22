@@ -2,8 +2,6 @@ openapi: 3.0.0
 info:
   title: Yarn Catalog API - OpenAPI 3.0.0
   version: 1.0.0
-servers:
-  - url: localhost:8081
 tags:
   - name: Catalog
 paths:

@@ -1,0 +1,4 @@
+providers:
+  consul:
+    endpoints:
+      - "consul:8500"

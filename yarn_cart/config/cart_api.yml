@@ -2,16 +2,43 @@ openapi: 3.0.0
 info:
   title: Yarn Cart API - OpenAPI 3.0.0
   version: 1.0.0
-servers:
-  - url: 127.0.0.1:8080
 tags:
   - name: Cart
 paths:
-  /cart:
+  /check:
+    get:
+      summary: Check if the service is running
+      responses:
+        "200":
+          description: Service is running
+  /cart/new:
+    post:
+      tags:
+        - Cart
+      summary: Creates a new cart
+      responses:
+        "201":
+          description: Cart created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cart_id:
+                    type: string
+                    format: uuid
+  /cart/{cart_id}:
     get:
       tags:
         - Cart
       summary: Returns current Yarns in cart
+      parameters:
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+          description: Cart id
       responses:
         "200":
           description: JSON array of yarns
@@ -19,16 +46,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cart"
+    delete:
+      tags:
+        - Cart
+      summary: Clear the cart
+      parameters:
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Cart cleared successfully
+  /cart/{cart_id}/{product_id}:
     post:
       tags:
         - Cart
       summary: Adds a Yarn to the cart
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Yarn"
+      parameters:
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+          description: Cart id
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+          description: Product id of the yarn
       responses:
         "201":
           description: Yarn added successfully
@@ -38,52 +86,53 @@ paths:
                 $ref: "#/components/schemas/Yarn"
         "400":
           description: Invalid input
-  /cart/{product_id}:
     patch:
-        tags:
-          - Cart 
-        summary: Update the Yarn quantity
-        parameters:
-          - in: path
-            name: product_id
-            required: true
-            schema:
-              type: string
-            description: Product id of the yarn
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  amount:
-                    type: integer
-        responses:
-          "200":
-            description: Quantity updated successfully.
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    yarn:
-                      $ref: '#/components/schemas/Yarn'
-                    quantity:
-                      type: integer
-          "404":
-            description: Yarn not found.
-    delete:
       tags:
         - Cart
-      summary: Remove one item in the cart
+      summary: Update the Yarn quantity
       parameters:
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+          description: Cart id
         - in: path
           name: product_id
           required: true
           schema:
             type: string
           description: Product id of the yarn
+      responses:
+        "200":
+          description: Quantity updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  yarn:
+                    $ref: "#/components/schemas/Yarn"
+                  quantity:
+                    type: integer
+        "404":
+          description: Yarn not found.
+    delete:
+      tags:
+        - Cart
+      summary: Remove one item in the cart
+      parameters:
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+          description: Cart id
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
       responses:
         "204":
           description: Yarn removed successfully
@@ -96,11 +145,7 @@ components:
       properties:
         product_id:
           type: string
-          x-go-type: primitive.ObjectID
-          x-go-import:
-            path: go.mongodb.org/mongo-driver/bson/primitive
-          x-oapi-codegen-extra-tags:
-            bson: _id,omitempty
+          format: uuid
         unit_name:
           type: string
         unit_color:
@@ -112,12 +157,15 @@ components:
     Cart:
       type: object
       properties:
+        cart_id:
+          type: string
+          format: uuid
+        items:
+          type: array
           items:
-            type: array
-            items:
-              type: object
-              properties:
-                yarn:
-                  $ref: '#/components/schemas/Yarn'
-                quantity:
-                  type: integer
+            type: object
+            properties:
+              yarn:
+                $ref: "#/components/schemas/Yarn"
+              quantity:
+                type: integer

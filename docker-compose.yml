@@ -2,10 +2,9 @@ name: yarn_store
 services:
   # Catalog Service
   catalog:
-    container_name: catalog
     build: ./yarn_catalog
     ports:
-      - "8080"
+      - "8081:8080"
     restart: always
     depends_on:
       - mongo
@@ -15,23 +14,21 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.catalog.rule=PathPrefix(`/catalog`)"
-      - "traefik.http.routers.catalog.service=catalog"
-      - "traefik.http.services.catalog.loadbalancer.server.port=8080"
 
   # Cart Service
   # cart:
   #   container_name: cart
   #   build: ./yarn_cart
   #   ports:
-  #     - "8080"
+  #     - "8082:8080"
   #   restart: always
+  #   depends_on:
+  #     - consul
   #   networks:
   #     - yarn_exchange
   #   labels:
   #     - "traefik.enable=true"
-  #     - "traefik.http.routers.catalog.rule=PathPrefix(`/cart`)"
-  #     - "traefik.http.routers.catalog.service=cart"
-  #     - "traefik.http.services.catalog.loadbalancer.server.port=8080"
+  #     - "traefik.http.routers.cart.rule=PathPrefix(`/cart`)"
 
   # Email Service
   # email:
@@ -55,8 +52,8 @@ services:
       - "8500:8500"
     networks:
       - yarn_exchange
-    volumes:
-      - ./consul/consul.json:/consul/config/consul.json
+    # volumes:
+      # - ./consul/consul.json:/consul/config/consul.json
 
   # Gateway
   traefik:
@@ -66,6 +63,7 @@ services:
     command:
       - --api.insecure=true
       - --providers.docker
+      # - --providers.consul
     ports:
       - "80:80"
       - "8080:8080"
@@ -74,6 +72,7 @@ services:
     depends_on:
       - consul
     volumes:
+      # - ./traefik/traefik.yml:/etc/traefik/traefik.yml
       - /var/run/docker.sock:/var/run/docker.sock
 
   # DataBases
@@ -94,7 +93,6 @@ services:
     restart: always
     ports:
       - "6379:6379"
-    # command: redis-server --save 20 1 --loglevel warning
     volumes:
       - redis_cache:/data
     networks:
