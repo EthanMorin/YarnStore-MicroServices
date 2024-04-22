@@ -10,17 +10,34 @@ import (
 // Cart defines model for Cart.
 type Cart struct {
 	CartId *openapi_types.UUID `json:"cart_id,omitempty"`
-	Items  *[]struct {
-		Quantity *int  `json:"quantity,omitempty"`
-		Yarn     *Yarn `json:"yarn,omitempty"`
-	} `json:"items,omitempty"`
+	Items  *[]CartItem         `json:"items,omitempty"`
+}
+
+// CartItem defines model for CartItem.
+type CartItem struct {
+	Quantity *int  `json:"quantity,omitempty"`
+	Yarn     *Yarn `json:"yarn,omitempty"`
 }
 
 // Yarn defines model for Yarn.
 type Yarn struct {
-	Available *bool               `json:"available,omitempty"`
-	ProductId *openapi_types.UUID `json:"product_id,omitempty"`
-	UnitColor *string             `json:"unit_color,omitempty"`
-	UnitName  *string             `json:"unit_name,omitempty"`
-	UnitPrice *float32            `json:"unit_price,omitempty"`
+	Available *bool    `json:"available,omitempty"`
+	ProductId *string  `json:"product_id,omitempty"`
+	UnitColor *string  `json:"unit_color,omitempty"`
+	UnitName  *string  `json:"unit_name,omitempty"`
+	UnitPrice *float32 `json:"unit_price,omitempty"`
 }
+
+// PatchCartCartIdProductIdJSONBody defines parameters for PatchCartCartIdProductId.
+type PatchCartCartIdProductIdJSONBody struct {
+	Quantity *int `json:"quantity,omitempty"`
+}
+
+// PostCartNewJSONRequestBody defines body for PostCartNew for application/json ContentType.
+type PostCartNewJSONRequestBody = Yarn
+
+// PostCartCartIdJSONRequestBody defines body for PostCartCartId for application/json ContentType.
+type PostCartCartIdJSONRequestBody = Yarn
+
+// PatchCartCartIdProductIdJSONRequestBody defines body for PatchCartCartIdProductId for application/json ContentType.
+type PatchCartCartIdProductIdJSONRequestBody PatchCartCartIdProductIdJSONBody

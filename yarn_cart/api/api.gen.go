@@ -29,15 +29,15 @@ type ServerInterface interface {
 	// Returns current Yarns in cart
 	// (GET /cart/{cart_id})
 	GetCartCartId(c *gin.Context, cartId string)
+	// Adds a Yarn to the cart
+	// (POST /cart/{cart_id})
+	PostCartCartId(c *gin.Context, cartId string)
 	// Remove one item in the cart
 	// (DELETE /cart/{cart_id}/{product_id})
 	DeleteCartCartIdProductId(c *gin.Context, cartId string, productId string)
 	// Update the Yarn quantity
 	// (PATCH /cart/{cart_id}/{product_id})
 	PatchCartCartIdProductId(c *gin.Context, cartId string, productId string)
-	// Adds a Yarn to the cart
-	// (POST /cart/{cart_id}/{product_id})
-	PostCartCartIdProductId(c *gin.Context, cartId string, productId string)
 	// Check if the service is running
 	// (GET /check)
 	GetCheck(c *gin.Context)
@@ -113,6 +113,30 @@ func (siw *ServerInterfaceWrapper) GetCartCartId(c *gin.Context) {
 	siw.Handler.GetCartCartId(c, cartId)
 }
 
+// PostCartCartId operation middleware
+func (siw *ServerInterfaceWrapper) PostCartCartId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "cart_id" -------------
+	var cartId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostCartCartId(c, cartId)
+}
+
 // DeleteCartCartIdProductId operation middleware
 func (siw *ServerInterfaceWrapper) DeleteCartCartIdProductId(c *gin.Context) {
 
@@ -179,39 +203,6 @@ func (siw *ServerInterfaceWrapper) PatchCartCartIdProductId(c *gin.Context) {
 	siw.Handler.PatchCartCartIdProductId(c, cartId, productId)
 }
 
-// PostCartCartIdProductId operation middleware
-func (siw *ServerInterfaceWrapper) PostCartCartIdProductId(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "cart_id" -------------
-	var cartId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Path parameter "product_id" -------------
-	var productId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "product_id", c.Param("product_id"), &productId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter product_id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PostCartCartIdProductId(c, cartId, productId)
-}
-
 // GetCheck operation middleware
 func (siw *ServerInterfaceWrapper) GetCheck(c *gin.Context) {
 
@@ -255,28 +246,29 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/cart/new", wrapper.PostCartNew)
 	router.DELETE(options.BaseURL+"/cart/:cart_id", wrapper.DeleteCartCartId)
 	router.GET(options.BaseURL+"/cart/:cart_id", wrapper.GetCartCartId)
+	router.POST(options.BaseURL+"/cart/:cart_id", wrapper.PostCartCartId)
 	router.DELETE(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.DeleteCartCartIdProductId)
 	router.PATCH(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.PatchCartCartIdProductId)
-	router.POST(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.PostCartCartIdProductId)
 	router.GET(options.BaseURL+"/check", wrapper.GetCheck)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"6hdbDQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

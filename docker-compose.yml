@@ -16,19 +16,19 @@ services:
       - "traefik.http.routers.catalog.rule=PathPrefix(`/catalog`)"
 
   # Cart Service
-  # cart:
-  #   container_name: cart
-  #   build: ./yarn_cart
-  #   ports:
-  #     - "8082:8080"
-  #   restart: always
-  #   depends_on:
-  #     - consul
-  #   networks:
-  #     - yarn_exchange
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.cart.rule=PathPrefix(`/cart`)"
+  cart:
+    container_name: cart
+    build: ./yarn_cart
+    ports:
+      - "8082:8080"
+    restart: always
+    depends_on:
+      - consul
+    networks:
+      - yarn_exchange
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cart.rule=PathPrefix(`/cart`)"
 
   # Email Service
   # email:
@@ -39,9 +39,6 @@ services:
   #   restart: always
   #   networks:
   #     - yarn_exchange
-  #   labels:
-  #     - "traefik.enable=true"
-  #     - "traefik.http.routers.catalog.service=email"
 
   # Service Registry
   consul:
@@ -52,8 +49,8 @@ services:
       - "8500:8500"
     networks:
       - yarn_exchange
-    # volumes:
-      # - ./consul/consul.json:/consul/config/consul.json
+    volumes:
+      - ./consul/consul.json:/consul/config/consul.json
 
   # Gateway
   traefik:
@@ -72,7 +69,6 @@ services:
     depends_on:
       - consul
     volumes:
-      # - ./traefik/traefik.yml:/etc/traefik/traefik.yml
       - /var/run/docker.sock:/var/run/docker.sock
 
   # DataBases

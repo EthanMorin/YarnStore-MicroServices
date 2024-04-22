@@ -16,6 +16,12 @@ paths:
       tags:
         - Cart
       summary: Creates a new cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Yarn"
       responses:
         "201":
           description: Cart created successfully
@@ -59,7 +65,6 @@ paths:
       responses:
         "204":
           description: Cart cleared successfully
-  /cart/{cart_id}/{product_id}:
     post:
       tags:
         - Cart
@@ -71,12 +76,12 @@ paths:
           schema:
             type: string
           description: Cart id
-        - in: path
-          name: product_id
-          required: true
-          schema:
-            type: string
-          description: Product id of the yarn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Yarn"
       responses:
         "201":
           description: Yarn added successfully
@@ -86,6 +91,7 @@ paths:
                 $ref: "#/components/schemas/Yarn"
         "400":
           description: Invalid input
+  /cart/{cart_id}/{product_id}:
     patch:
       tags:
         - Cart
@@ -103,6 +109,15 @@ paths:
           schema:
             type: string
           description: Product id of the yarn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
       responses:
         "200":
           description: Quantity updated successfully.
@@ -145,7 +160,6 @@ components:
       properties:
         product_id:
           type: string
-          format: uuid
         unit_name:
           type: string
         unit_color:
@@ -154,6 +168,13 @@ components:
           type: number
         available:
           type: boolean
+    CartItem:
+      type: object
+      properties:
+        yarn:
+          $ref: "#/components/schemas/Yarn"
+        quantity:
+          type: integer
     Cart:
       type: object
       properties:
@@ -163,9 +184,4 @@ components:
         items:
           type: array
           items:
-            type: object
-            properties:
-              yarn:
-                $ref: "#/components/schemas/Yarn"
-              quantity:
-                type: integer
+            $ref: "#/components/schemas/CartItem"

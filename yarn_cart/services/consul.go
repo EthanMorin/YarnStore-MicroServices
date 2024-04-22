@@ -24,7 +24,7 @@ func Register() {
 
 	registeration := &consulapi.AgentServiceRegistration{
 		ID:      serviceId,
-		Name:    "catalog",
+		Name:    "cart",
 		Port:    port,
 		Address: address,
 		Check: &consulapi.AgentServiceCheck{
