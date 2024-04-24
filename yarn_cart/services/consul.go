@@ -31,6 +31,11 @@ func Register() {
 		Name:    "cart",
 		Port:    port,
 		Address: address,
+		Check: &consulapi.AgentServiceCheck{
+			HTTP:     fmt.Sprintf("http://%s:%v/cart/check", address, port),
+			Interval: "10s",
+			Timeout:  "30s",
+		},
 	}
 
 	regiErr := consul.Agent().ServiceRegister(registeration)
