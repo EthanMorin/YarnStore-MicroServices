@@ -30,6 +30,38 @@ services:
     deploy:
       replicas: 5
 
+  # Order Service
+  order:
+    build: ./yarn_order
+    ports:
+      - "8080"
+    restart: always
+    depends_on:
+      - consul
+      - traefik
+      - rabbitmq
+      - mongo
+    networks:
+      - yarn_exchange
+    deploy:
+      replicas: 5
+
+  # User Service
+  user:
+    build: ./yarn_user
+    ports:
+      - "8080"
+    restart: always
+    depends_on:
+      - consul
+      - traefik
+      - rabbitmq
+      - mongo
+    networks:
+      - yarn_exchange
+    deploy:
+      replicas: 5
+
   # Email Service
   email:
     build: ./yarn_email
@@ -40,22 +72,6 @@ services:
       - yarn_exchange
     deploy:
       replicas: 5
-
-  # Order Service
-  # orders:
-  #   build: ./yarn_orders
-  #   restart: always
-  #   ports:
-  #     - "8080"
-  #   depends_on:
-  #     - consul
-  #     - traefik
-  #     - rabbitmq
-  #   networks:
-  #     - yarn_exchange
-  #   deploy:
-  #     replicas: 5
-
 
   # Service Registry
   consul:
