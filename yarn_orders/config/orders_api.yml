@@ -1,0 +1,43 @@
+
+openapi: 3.0.0
+info:
+  title: Yarn Orders API - OpenAPI 3.0.0
+  version: 1.0.0
+tags:
+  - name: Orders
+paths:
+  /orders/check:
+    get:
+      summary: Check if the service is running
+      responses:
+        "200":
+          description: Service is running
+  /orders/new/{user_id}/{cart_id}:
+    post:
+      tags:
+        - Orders
+      summary: Creates a new order
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+          description: User id
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+          description: Cart id
+      responses:
+        "201":
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                    format: uuid
