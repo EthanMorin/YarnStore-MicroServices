@@ -31,5 +31,5 @@ type Yarn struct {
 // PostCartNewJSONRequestBody defines body for PostCartNew for application/json ContentType.
 type PostCartNewJSONRequestBody = CartItems
 
-// PostCartCartIdJSONRequestBody defines body for PostCartCartId for application/json ContentType.
-type PostCartCartIdJSONRequestBody = CartItems
+// PatchCartCartIdJSONRequestBody defines body for PatchCartCartId for application/json ContentType.
+type PatchCartCartIdJSONRequestBody = CartItems

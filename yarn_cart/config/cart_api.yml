@@ -5,7 +5,7 @@ info:
 tags:
   - name: Cart
 paths:
-  /check:
+  /cart/check:
     get:
       summary: Check if the service is running
       responses:
@@ -65,7 +65,7 @@ paths:
       responses:
         "204":
           description: Cart cleared successfully
-    post:
+    patch:
       tags:
         - Cart
       summary: Adds a Yarn to the cart

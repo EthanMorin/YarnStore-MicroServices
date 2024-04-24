@@ -11,6 +11,43 @@ import (
 
 type API struct{}
 
+// GetCartCheck implements ServerInterface.
+func (a *API) GetCartCheck(c *gin.Context) {
+	c.Status(http.StatusOK)
+}
+
+// PatchCartCartId implements ServerInterface.
+func (a *API) PatchCartCartId(c *gin.Context, cartId string) {
+	var items models.CartItems
+	if err := c.BindJSON(&items); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	cart, err := data.GetCart(cartId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	for _, newItem := range items {
+		found := false
+		for _, existingItem := range *cart.Items {
+			if *existingItem.Yarn.ProductId == *newItem.Yarn.ProductId {
+				*existingItem.Quantity += *newItem.Quantity
+				found = true
+				break
+			}
+		}
+		if !found {
+			*cart.Items = append(*cart.Items, newItem)
+		}
+	}
+	if err := data.PostCart(cart); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, cart)
+}
+
 // DeleteCartCartId implements ServerInterface.
 func (a *API) DeleteCartCartId(c *gin.Context, cartId string) {
 	if err := data.RemoveCart(cartId); err != nil {
@@ -50,38 +87,6 @@ func (a *API) GetCartCartId(c *gin.Context, cartId string) {
 	c.JSON(http.StatusOK, cart)
 }
 
-// PostCartCartId implements ServerInterface.
-func (a *API) PostCartCartId(c *gin.Context, cartId string) {
-	var items models.CartItems
-	if err := c.BindJSON(&items); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	cart, err := data.GetCart(cartId)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	for _, newItem := range items {
-		found := false
-		for _, existingItem := range *cart.Items {
-			if *existingItem.Yarn.ProductId == *newItem.Yarn.ProductId {
-				*existingItem.Quantity += *newItem.Quantity
-				found = true
-				break
-			}
-		}
-		if !found {
-			*cart.Items = append(*cart.Items, newItem)
-		}
-	}
-	if err := data.PostCart(cart); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, cart)
-}
-
 // PostCartNew implements ServerInterface.
 func (a *API) PostCartNew(c *gin.Context) {
 	var cart models.Cart
@@ -99,11 +104,6 @@ func (a *API) PostCartNew(c *gin.Context) {
 	}
 	data.PostCart(&cart)
 	c.JSON(http.StatusOK, cart)
-}
-
-// GetCheck implements ServerInterface.
-func (a *API) GetCheck(c *gin.Context) {
-	c.Status(http.StatusOK)
 }
 
 func NewAPI() *API {
