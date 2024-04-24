@@ -21,7 +21,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CartItem"
+              $ref: "#/components/schemas/CartItems"
       responses:
         "201":
           description: Cart created successfully
@@ -81,7 +81,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CartItem"
+              $ref: "#/components/schemas/CartItems"
       responses:
         "201":
           description: Yarn added successfully
@@ -92,46 +92,6 @@ paths:
         "400":
           description: Invalid input
   /cart/{cart_id}/{product_id}:
-    patch:
-      tags:
-        - Cart
-      summary: Update the Yarn quantity
-      parameters:
-        - in: path
-          name: cart_id
-          required: true
-          schema:
-            type: string
-          description: Cart id
-        - in: path
-          name: product_id
-          required: true
-          schema:
-            type: string
-          description: Product id of the yarn
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                quantity:
-                  type: integer
-      responses:
-        "200":
-          description: Quantity updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  yarn:
-                    $ref: "#/components/schemas/Yarn"
-                  quantity:
-                    type: integer
-        "404":
-          description: Yarn not found.
     delete:
       tags:
         - Cart
@@ -153,23 +113,6 @@ paths:
           description: Yarn removed successfully
         "404":
           description: Yarn not found
-  /cart/{cart_id}/checkout:
-    post:
-      tags:
-        - Cart
-      summary: Checkout the cart
-      parameters:
-        - in: path
-          name: cart_id
-          required: true
-          schema:
-            type: string
-          description: Cart id
-      responses:
-        "201":
-          description: Checkout successful
-        "404":
-          description: Cart not found
 components:
   schemas:
     Yarn:
@@ -185,13 +128,14 @@ components:
           type: number
         available:
           type: boolean
-    CartItem:
-      type: object
-      properties:
-        yarn:
-          $ref: "#/components/schemas/Yarn"
-        quantity:
-          type: integer
+    CartItems:
+      type: array
+      items:
+        properties:
+          yarn:
+            $ref: "#/components/schemas/Yarn"
+          quantity:
+            type: integer
     Cart:
       type: object
       properties:
@@ -199,6 +143,4 @@ components:
           type: string
           format: uuid
         items:
-          type: array
-          items:
-            $ref: "#/components/schemas/CartItem"
+          $ref: "#/components/schemas/CartItems"

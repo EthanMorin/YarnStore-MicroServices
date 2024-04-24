@@ -35,9 +35,6 @@ type ServerInterface interface {
 	// Remove one item in the cart
 	// (DELETE /cart/{cart_id}/{product_id})
 	DeleteCartCartIdProductId(c *gin.Context, cartId string, productId string)
-	// Update the Yarn quantity
-	// (PATCH /cart/{cart_id}/{product_id})
-	PatchCartCartIdProductId(c *gin.Context, cartId string, productId string)
 	// Check if the service is running
 	// (GET /check)
 	GetCheck(c *gin.Context)
@@ -170,39 +167,6 @@ func (siw *ServerInterfaceWrapper) DeleteCartCartIdProductId(c *gin.Context) {
 	siw.Handler.DeleteCartCartIdProductId(c, cartId, productId)
 }
 
-// PatchCartCartIdProductId operation middleware
-func (siw *ServerInterfaceWrapper) PatchCartCartIdProductId(c *gin.Context) {
-
-	var err error
-
-	// ------------- Path parameter "cart_id" -------------
-	var cartId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "cart_id", c.Param("cart_id"), &cartId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter cart_id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	// ------------- Path parameter "product_id" -------------
-	var productId string
-
-	err = runtime.BindStyledParameterWithOptions("simple", "product_id", c.Param("product_id"), &productId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter product_id: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.PatchCartCartIdProductId(c, cartId, productId)
-}
-
 // GetCheck operation middleware
 func (siw *ServerInterfaceWrapper) GetCheck(c *gin.Context) {
 
@@ -248,27 +212,24 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/cart/:cart_id", wrapper.GetCartCartId)
 	router.POST(options.BaseURL+"/cart/:cart_id", wrapper.PostCartCartId)
 	router.DELETE(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.DeleteCartCartIdProductId)
-	router.PATCH(options.BaseURL+"/cart/:cart_id/:product_id", wrapper.PatchCartCartIdProductId)
 	router.GET(options.BaseURL+"/check", wrapper.GetCheck)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/9RWTW8jNwz9KwLb49R22pzmlrZA4R6StEEPQREEskTbys5IikQ5MAz/9wU1/p6x87EJ",
-	"snsaQUOK5OPjkxagXO2dRUsRygVENcVa5uUfMhB/fXAeAxnMu0oGujeal2MXaklQQkpGQwE09wglRArG",
-	"TmBZgCGss9Nm8XPAMZTwU38btb8K2ed4Q8KaPVdHyRDkHJbbDTd6QEVssbFuZfiYpCVDc16v3IwlnGBg",
-	"v7kM9rlMbtmmM+rtyns/opxJU8lRhTshR85VKC07+eB0UmvUWigla+heucqF47+trPH4Xx+M2v1tUz3i",
-	"atsV8JaxY5eNDXHGuSbBcIqL66H4RVx5tLz6rTfoDaCAGYZonIUSzvLOsgDn0UpvoIS1kZc0zVj0mSB9",
-	"i08ZJhczhRgsScbZoYYSrl0kjneJT1BAwMeEkX53OndMOUtos5f0vjIq+/UforNbfr6cSlwwRzABNZQU",
-	"EuaN6J2NTfN+HZy9Ku5bx6G7GRqjCsZTA3DuggooCbWISSmMcZyqqpmBmOpahjnbZZMopLD4JDgHjicn",
-	"Ecr/m7m9Y4emF4tVjktOUmOFhO2e/Jn32TVjp3NLg6yRMPCpCzCcILcZCmjouCn+EOJiB65DFO5a8J83",
-	"ebVxqFCGZ3BgE0FTPIJBARPsIOBfSKcq7cglF/lhCAzelfhdxPr75upSZDUVbixYA+MBlP8ipWCjUCkE",
-	"tCRYFaIw9iiyp2f7M7H9sfTkLe3Mki21bk1HAecNm/bth3YmK6OFsT7RQeMvtGYhyUeSOzFMbUHpL7ZX",
-	"26vU5bpx+wSCFJ1CtnNDv7uWZWAD1m7W2a1jHtaRGLtkdWtO+SThLAp+VfGEntI/L0lNO8aUt7+TfuxH",
-	"WKUijGal4tLyi61477a9TSRe/tLsvu6fk47BB2Xzbe/etgD9s4olktetx0rvhczuHVD7v3xW7nk23BTU",
-	"LUVTVF84xNErPht0Q7yf1g2GmVEoTBQhWbt+ru28M/goYRo+xi7r5SbHxZqdjXjfLb8GAAD//0+UW7tj",
-	"DQAA",
+	"H4sIAAAAAAAC/9RWXU8rNxD9K9a0j1sSWp72jbZSlT4AKk+oQsixJ4m5u+PFHgdF0f73q/Em5GM3IBBX",
+	"6D7Fsufj+Jzx2azB+LrxhMQRyjVEs8Ba5+VfOrD8NsE3GNhh3jU68IOzspz5UGuGElJyFgrgVYNQQuTg",
+	"aA5tAY6xzkm/BpxBCb+Mds1Gm04jaTPJgW37UsNPH9Gw1Ngdl+tdwUNMT0kTO17JelPAEeMcg1RY6UBv",
+	"gbiTmHYPgA5BryT7bpN92FEvtav0tMK9llPvK9QkSU3wNpktTz1eEjl+ML7y4fQx6RpPnzbBmf1jSvVU",
+	"bttnULYczXwOdiyI852UEKsubybqN3XdIMnqj7Px2RgKWGKIzhOUcJ532gJ8g6QbByVsgxrNi8zFSEZi",
+	"RPicafIxD42Qpdl5mlgo4cZHln5X+AwFBHxKGPlPb7NixhMj5SzdNJUzOW/0GD3tJvI9U9R2LVxACyWH",
+	"hHkjNp5ip97v4/N3Nf7oCxhWw2I0wTXcMZxlMAE1o1UxGYMxzlJVrXJ6THWtw0rickhUWhE+K8Eg/fQ8",
+	"Qvl/91TvJaETY73B2ApIixUy9kX5O+9LaibPZk2DrpExSNU1OAEoOkMB3Ty+XP6Y4mKPrmMW7nv0X3S4",
+	"+jxUqMMbPEiI4gWe4KCAOQ5M4D/Ir910AEu+5A9jYPypkz80WP/eXl+pbGPKz5SYYDyi8j/kFCgqk0JA",
+	"YiW2EJWjk8y+/ri/ktufzFA+omc2bW1t73kUcNGN02H8hJa6clY5ahIfKX9prThJLsn+ldfUd5TRevdx",
+	"e5e93HRpXzAhxaCT7X2jP93MMrEBa78cVOtUBnlWM5/I9h6qVFKeUMk/IHmib0i2QPNNmpz0whww7EqH",
+	"wG4xLJ1B5aIKiWj7XdszZCml3CxDikPR7QvG9Zb8bsjv2+8BAAD//zUZYpN/CgAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
