@@ -9,6 +9,7 @@ services:
     depends_on:
       - mongo
       - consul
+      - traefik
     networks:
       - yarn_exchange
     deploy:
@@ -22,6 +23,8 @@ services:
     restart: always
     depends_on:
       - consul
+      - traefik
+      - cache
     networks:
       - yarn_exchange
     deploy:
@@ -30,8 +33,6 @@ services:
   # Email Service
   email:
     build: ./yarn_email
-    ports:
-      - "8080"
     restart: always
     depends_on:
       - rabbitmq
@@ -40,18 +41,21 @@ services:
     deploy:
       replicas: 5
 
-  # Service Discovery
-  # registrator:
-  #   image: metabrainz/serviceregistrator 
-  #   command: 
-  #     - -h consul 
-  #     - -i 8080
-  #   volumes:
-  #     - /var/run/docker.sock:/tmp/docker.sock
+  # Order Service
+  # orders:
+  #   build: ./yarn_orders
+  #   restart: always
+  #   ports:
+  #     - "8080"
   #   depends_on:
   #     - consul
+  #     - traefik
+  #     - rabbitmq
   #   networks:
   #     - yarn_exchange
+  #   deploy:
+  #     replicas: 5
+
 
   # Service Registry
   consul:

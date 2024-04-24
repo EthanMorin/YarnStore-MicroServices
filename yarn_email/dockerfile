@@ -9,7 +9,5 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o /emailservice
 
-EXPOSE 8080
-
 # Run
 CMD [ "/emailservice" ]
