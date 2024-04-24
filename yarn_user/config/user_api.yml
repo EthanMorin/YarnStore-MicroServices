@@ -1,0 +1,84 @@
+
+openapi: 3.0.0
+info:
+  title: Yarn User API - OpenAPI 3.0.0
+  version: 1.0.0
+tags:
+  - name: Users
+    description: User management
+paths:
+  /user/check:
+    get:
+      summary: Check if the service is running
+      responses:
+        "200":
+          description: Service is running
+  /user:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        "201":
+          description: User created
+        "400":
+          description: Invalid input
+  /user/{user_id}:
+    get:
+      summary: Get user by ID
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: User not found
+    delete:
+      summary: Delete user by ID
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User deleted
+        "404":
+          description: User not found
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: string
+          x-go-type: primitive.ObjectID
+          x-go-import:
+            path: go.mongodb.org/mongo-driver/bson/primitive
+          x-oapi-codegen-extra-tags:
+            bson: _id,omitempty
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      required:
+        - name
+        - email
+        - password
