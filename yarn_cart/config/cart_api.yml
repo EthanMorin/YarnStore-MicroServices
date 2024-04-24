@@ -21,7 +21,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Yarn"
+              $ref: "#/components/schemas/CartItem"
       responses:
         "201":
           description: Cart created successfully
@@ -81,14 +81,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Yarn"
+              $ref: "#/components/schemas/CartItem"
       responses:
         "201":
           description: Yarn added successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Yarn"
+                $ref: "#/components/schemas/Cart"
         "400":
           description: Invalid input
   /cart/{cart_id}/{product_id}:
@@ -153,6 +153,23 @@ paths:
           description: Yarn removed successfully
         "404":
           description: Yarn not found
+  /cart/{cart_id}/checkout:
+    post:
+      tags:
+        - Cart
+      summary: Checkout the cart
+      parameters:
+        - in: path
+          name: cart_id
+          required: true
+          schema:
+            type: string
+          description: Cart id
+      responses:
+        "201":
+          description: Checkout successful
+        "404":
+          description: Cart not found
 components:
   schemas:
     Yarn:

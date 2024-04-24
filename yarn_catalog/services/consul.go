@@ -8,6 +8,7 @@ import (
 
 	consulapi "github.com/hashicorp/consul/api"
 )
+
 func Register() {
 	config := consulapi.DefaultConfig()
 	config.Address = "consul:8500"
@@ -15,13 +16,17 @@ func Register() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	serviceId := "go-catalog-service"
+	serviceId := "go-catalog-service:" + getHostname()
 	port, _ := strconv.Atoi(getPort()[1:len(getPort())])
 	fmt.Printf("port:%v \n", port)
 	address := getHostname()
 	fmt.Printf("address:%v \n", address)
-
+	tags := []string{
+		"traefik.enable=true",
+		fmt.Sprintf("traefik.http.routers.%s.rule=PathPrefix(`/catalog`)", getHostname()),
+	}
 	registeration := &consulapi.AgentServiceRegistration{
+		Tags:    tags,
 		ID:      serviceId,
 		Name:    "catalog",
 		Port:    port,

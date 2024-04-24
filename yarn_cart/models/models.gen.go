@@ -34,10 +34,10 @@ type PatchCartCartIdProductIdJSONBody struct {
 }
 
 // PostCartNewJSONRequestBody defines body for PostCartNew for application/json ContentType.
-type PostCartNewJSONRequestBody = Yarn
+type PostCartNewJSONRequestBody = CartItem
 
 // PostCartCartIdJSONRequestBody defines body for PostCartCartId for application/json ContentType.
-type PostCartCartIdJSONRequestBody = Yarn
+type PostCartCartIdJSONRequestBody = CartItem
 
 // PatchCartCartIdProductIdJSONRequestBody defines body for PatchCartCartIdProductId for application/json ContentType.
 type PatchCartCartIdProductIdJSONRequestBody PatchCartCartIdProductIdJSONBody

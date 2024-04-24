@@ -1,4 +1,3 @@
-
 package services
 
 import (
@@ -9,6 +8,7 @@ import (
 
 	consulapi "github.com/hashicorp/consul/api"
 )
+
 func Register() {
 	config := consulapi.DefaultConfig()
 	config.Address = "consul:8500"
@@ -16,22 +16,21 @@ func Register() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	serviceId := "go-cart-service"
+	serviceId := "go-cart-service:" + getHostname()
 	port, _ := strconv.Atoi(getPort()[1:len(getPort())])
 	fmt.Printf("port:%v \n", port)
 	address := getHostname()
 	fmt.Printf("address:%v \n", address)
-
+	tags := []string{
+		"traefik.enable=true",
+		fmt.Sprintf("traefik.http.routers.%s.rule=PathPrefix(`/cart`)", getHostname()),
+	}
 	registeration := &consulapi.AgentServiceRegistration{
+		Tags:    tags,
 		ID:      serviceId,
 		Name:    "cart",
 		Port:    port,
 		Address: address,
-		Check: &consulapi.AgentServiceCheck{
-			HTTP:     fmt.Sprintf("http://%s:%v/check", address, port),
-			Interval: "10s",
-			Timeout:  "30s",
-		},
 	}
 
 	regiErr := consul.Agent().ServiceRegister(registeration)

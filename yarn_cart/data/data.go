@@ -16,35 +16,37 @@ var client = redis.NewClient(&redis.Options{
 })
 
 func PostRedis(cart *models.Cart) error {
-	cartMarshaled, err := json.Marshal(cart)
+	// Marshal the cart into a JSON string
+	val, err := json.Marshal(cart)
 	if err != nil {
 		log.Println(err)
-		return err
+		return err // Return an error if JSON marshaling fails
 	}
-	err = client.Set(context.Background(), cart.CartId.String(), string(cartMarshaled), 0).Err()
+	// Save the cart to Redis
+	err = client.Set(context.Background(), cart.CartId.String(), val, 0).Err()
 	if err != nil {
 		log.Println(err)
-		return err
+		return err // Return an error if the Redis operation fails
 	}
 	return nil
 }
 
 func GetRedis(cartId string) (*models.Cart, error) {
 	var cart models.Cart
-	val, err := client.Get(context.Background(), cartId).Result()
+	cartJson, err := client.Get(context.Background(), cartId).Result()
 	if err != nil {
 		log.Println(err)
 		return nil, err // Return an error if the Redis operation fails
 	}
-	err = json.Unmarshal([]byte(val), &cart)
+	err = json.Unmarshal([]byte(cartJson), &cart.Items)
 	if err != nil {
 		log.Println(err)
 		return nil, err // Return an error if JSON unmarshaling fails
 	}
-	return &cart, nil // Return the cart and nil error on success
+	return &cart, nil
 }
 
-func PatchQuantity(cartId string, productId string, newQuantity int) error {
+func PatchQuantity(cartId string, productId string, newQuantity *models.PatchCartCartIdProductIdJSONRequestBody) error {
 	// Retrieve the cart from Redis
 	val, err := client.Get(context.Background(), cartId).Result()
 	if err != nil {
@@ -65,7 +67,7 @@ func PatchQuantity(cartId string, productId string, newQuantity int) error {
 	for i, item := range *cart.Items {
 		if *item.Yarn.ProductId == productId {
 			// Update the quantity
-			*item.Quantity = newQuantity
+			*item.Quantity = *newQuantity.Quantity
 			// Update the item in the cart
 			(*cart.Items)[i] = item
 			found = true
@@ -85,6 +87,15 @@ func PatchQuantity(cartId string, productId string, newQuantity int) error {
 		return err
 	}
 
+	return nil
+}
+
+func RemoveCart(cartId string) error {
+	err := client.Del(context.Background(), cartId).Err()
+	if err != nil {
+		log.Println("Error deleting cart:", err)
+		return err
+	}
 	return nil
 }
 

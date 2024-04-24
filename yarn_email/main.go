@@ -8,6 +8,7 @@ import (
 )
 
 func main() {
+	Register()
 	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
 		log.Println(err)

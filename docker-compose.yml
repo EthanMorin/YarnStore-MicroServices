@@ -4,39 +4,52 @@ services:
   catalog:
     build: ./yarn_catalog
     ports:
-      - "8081:8080"
+      - "8080"
     restart: always
     depends_on:
       - mongo
       - consul
     networks:
       - yarn_exchange
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.catalog.rule=PathPrefix(`/catalog`)"
+    deploy:
+      replicas: 5
 
   # Cart Service
   cart:
-    container_name: cart
     build: ./yarn_cart
     ports:
-      - "8082:8080"
+      - "8080"
     restart: always
     depends_on:
       - consul
     networks:
       - yarn_exchange
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.cart.rule=PathPrefix(`/cart`)"
+    deploy:
+      replicas: 5
 
   # Email Service
-  # email:
-  #   container_name: email
-  #   build: ./yarn_email
-  #   ports:
-  #     - "8080"
-  #   restart: always
+  email:
+    build: ./yarn_email
+    ports:
+      - "8080"
+    restart: always
+    depends_on:
+      - rabbitmq
+    networks:
+      - yarn_exchange
+    deploy:
+      replicas: 5
+
+  # Service Discovery
+  # registrator:
+  #   image: metabrainz/serviceregistrator 
+  #   command: 
+  #     - -h consul 
+  #     - -i 8080
+  #   volumes:
+  #     - /var/run/docker.sock:/tmp/docker.sock
+  #   depends_on:
+  #     - consul
   #   networks:
   #     - yarn_exchange
 
@@ -54,13 +67,9 @@ services:
 
   # Gateway
   traefik:
-    image: traefik:v2.5
+    image: traefik:latest
     container_name: traefik
     restart: always
-    command:
-      - --api.insecure=true
-      - --providers.docker
-      # - --providers.consul
     ports:
       - "80:80"
       - "8080:8080"
@@ -69,6 +78,7 @@ services:
     depends_on:
       - consul
     volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
       - /var/run/docker.sock:/var/run/docker.sock
 
   # DataBases
@@ -82,6 +92,46 @@ services:
     restart: always
     networks:
       - yarn_exchange
+
+  # mongo:
+  #   image: mongo:latest
+  #   command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+  #   ports:
+  #     - 27017:27017
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   healthcheck:
+  #     test: test $$(echo "rs.initiate({_id:'my-replica-set',members:[{_id:0,host:\"mongo:27017\"},{_id:1,host:\"mongo1:27018\"},{_id:2,host:\"mongo2:27019\"}]}).ok || rs.status().ok" | mongo --port 27017 --quiet) -eq 1
+  #     interval: 10s
+  #     start_period: 30s
+  #   volumes:
+  #     - "mongodb_data:/data/db"
+  #   networks:
+  #     - yarn_exchange
+
+  # mongo1:
+  #   image: mongo:latest
+  #   command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27018"]
+  #   ports:
+  #     - 27018:27018
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   volumes:
+  #     - "mongodb1_data:/data/db"
+  #   networks:
+  #     - yarn_exchange
+
+  # mongo2:
+  #   image: mongo:latest
+  #   command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27019"]
+  #   ports:
+  #     - 27019:27019
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   volumes:
+  #     - "mongodb2_data:/data/db"
+  #   networks:
+  #     - yarn_exchange
 
   cache:
     image: redis:latest
@@ -109,10 +159,13 @@ services:
       - yarn_exchange
 
 volumes:
-  mongodb_data: {}
   redis_cache: {}
   rabbit_data: {}
   rabbit_log: {}
+
+  mongodb_data:
+  mongodb1_data:
+  mongodb2_data:
 networks:
   yarn_exchange:
     driver: bridge
