@@ -32,7 +32,7 @@ func Register() {
 		Port:    port,
 		Address: address,
 		Check: &consulapi.AgentServiceCheck{
-			HTTP:     fmt.Sprintf("http://%s:%v/check", address, port),
+			HTTP:     fmt.Sprintf("http://%s:%v/catalog/check", address, port),
 			Interval: "10s",
 			Timeout:  "30s",
 		},

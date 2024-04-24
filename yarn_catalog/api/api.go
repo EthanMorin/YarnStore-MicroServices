@@ -11,8 +11,8 @@ import (
 
 type API struct{}
 
-// GetCheck implements ServerInterface.
-func (a *API) GetCheck(c *gin.Context) {
+// GetCatalogCheck implements ServerInterface.
+func (a *API) GetCatalogCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 

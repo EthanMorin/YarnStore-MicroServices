@@ -5,7 +5,7 @@ info:
 tags:
   - name: Catalog
 paths:
-  /check:
+  /catalog/check:
     get:
       summary: Check if the service is running
       responses:

@@ -26,6 +26,9 @@ type ServerInterface interface {
 	// Adds a Yarn to the catalog
 	// (POST /catalog)
 	PostCatalog(c *gin.Context)
+	// Check if the service is running
+	// (GET /catalog/check)
+	GetCatalogCheck(c *gin.Context)
 	// Delete one item in the catalog
 	// (DELETE /catalog/{product_id})
 	DeleteCatalogProductId(c *gin.Context, productId string)
@@ -35,9 +38,6 @@ type ServerInterface interface {
 	// Update the Yarn availability
 	// (PATCH /catalog/{product_id})
 	PatchCatalogProductId(c *gin.Context, productId string)
-	// Check if the service is running
-	// (GET /check)
-	GetCheck(c *gin.Context)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -73,6 +73,19 @@ func (siw *ServerInterfaceWrapper) PostCatalog(c *gin.Context) {
 	}
 
 	siw.Handler.PostCatalog(c)
+}
+
+// GetCatalogCheck operation middleware
+func (siw *ServerInterfaceWrapper) GetCatalogCheck(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetCatalogCheck(c)
 }
 
 // DeleteCatalogProductId operation middleware
@@ -147,19 +160,6 @@ func (siw *ServerInterfaceWrapper) PatchCatalogProductId(c *gin.Context) {
 	siw.Handler.PatchCatalogProductId(c, productId)
 }
 
-// GetCheck operation middleware
-func (siw *ServerInterfaceWrapper) GetCheck(c *gin.Context) {
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetCheck(c)
-}
-
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -189,28 +189,28 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/catalog", wrapper.GetCatalog)
 	router.POST(options.BaseURL+"/catalog", wrapper.PostCatalog)
+	router.GET(options.BaseURL+"/catalog/check", wrapper.GetCatalogCheck)
 	router.DELETE(options.BaseURL+"/catalog/:product_id", wrapper.DeleteCatalogProductId)
 	router.GET(options.BaseURL+"/catalog/:product_id", wrapper.GetCatalogProductId)
 	router.PATCH(options.BaseURL+"/catalog/:product_id", wrapper.PatchCatalogProductId)
-	router.GET(options.BaseURL+"/check", wrapper.GetCheck)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
