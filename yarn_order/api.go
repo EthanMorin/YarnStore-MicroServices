@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type API struct {
@@ -24,8 +25,10 @@ func (a *API) GetOrderCheck(c *gin.Context) {
 // PostOrdersNewUserIdCartId implements ServerInterface.
 func (a *API) PostOrderNewUserIdCartId(c *gin.Context, userId string, cartId string) {
 	var order Order
+	orderId := uuid.New()
 	order.UserId = &userId
 	order.CartId = &cartId
+	order.OrderId = &orderId
 	result, err := a.service.postOrder(&order)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
