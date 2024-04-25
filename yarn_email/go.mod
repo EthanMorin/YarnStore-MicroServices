@@ -4,7 +4,7 @@ go 1.22.2
 
 require (
 	github.com/hashicorp/consul/api v1.28.2
-	github.com/streadway/amqp v1.1.0
+	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/wneessen/go-mail v0.4.1
 )
 
