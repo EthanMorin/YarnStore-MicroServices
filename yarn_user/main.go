@@ -17,6 +17,10 @@ func newServer(api *API) *gin.Engine {
 }
 
 func main() {
+	err := NewDB()
+	if err != nil {
+		panic(err)
+	}
 	Register()
 	server := newServer(NewAPI())
 	server.Run(":8080")

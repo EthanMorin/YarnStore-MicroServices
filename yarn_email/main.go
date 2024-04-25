@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/streadway/amqp"
@@ -11,32 +10,50 @@ func main() {
 	Register()
 	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 	}
 	defer conn.Close()
+
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Println(err)
+		log.Println(err.Error())
 	}
 	defer ch.Close()
 
-	msgs, err := ch.Consume(
-		"cart",
-		"",
-		true,
-		false,
-		false,
-		false,
-		nil,
+	q, err := ch.QueueDeclare(
+		"order", // name
+		false,   // durable
+		false,   // delete when unused
+		false,   // exclusive
+		false,   // no-wait
+		nil,     // arguments
 	)
+	if err != nil {
+		log.Println(err.Error())
+	}
 
-	forever := make(chan bool)
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		true,   // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	var forever chan struct{}
+
 	go func() {
 		for d := range msgs {
-			fmt.Printf("Received a message: %s", d.Body)
+			log.Printf("Sending email confirmation to: %s", d.Body)
+			// send email
 		}
 	}()
-	fmt.Println("Successfully Connected to our RabbitMQ Instance")
-	fmt.Println(" [*] - waiting for messages")
+
+	log.Print("Waiting for messages")
 	<-forever
 }

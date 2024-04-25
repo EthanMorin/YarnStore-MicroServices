@@ -24,7 +24,7 @@ func NewDB() error {
 }
 
 func userCollection() *mongo.Collection {
-	return client.Database("yarn_user").Collection("user")
+	return client.Database("yarn_store").Collection("user")
 }
 
 func postUser(obj *PostUserJSONRequestBody) (*mongo.InsertOneResult, error) {

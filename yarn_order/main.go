@@ -18,6 +18,15 @@ func newServer(ordersApi *API) *gin.Engine {
 
 func main() {
 	Register()
-	server := newServer(NewAPI())
+	mq, err := NewRabbitQueue()
+	if err != nil {
+		panic(err)
+	}
+	mongo, err := NewDB()
+	if err != nil {
+		panic(err)
+	}
+	service := NewOrderService(mq, mongo)
+	server := newServer(NewAPI(service))
 	server.Run(":8080")
 }

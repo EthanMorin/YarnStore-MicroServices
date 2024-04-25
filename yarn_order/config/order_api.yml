@@ -36,8 +36,16 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  order_id:
-                    type: string
-                    format: uuid
+                $ref: "#/components/schemas/order"
+components:
+  schemas:
+    order: 
+      type: object
+      properties:
+        order_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+        cart_id:
+          type: string
