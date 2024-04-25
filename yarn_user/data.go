@@ -43,6 +43,14 @@ func getUser(objId primitive.ObjectID) (*User, error) {
 	return &user, nil
 }
 
+func getUserByEmailAndPassword(email *string, password *string) (*User, error) {
+	var user User
+	if err := userCollection().FindOne(context.Background(), bson.M{"email": email, "password": password}).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func DeleteUser(objId primitive.ObjectID) error {
 	_, err := userCollection().DeleteOne(context.Background(), bson.M{"_id": objId})
 	if err != nil {

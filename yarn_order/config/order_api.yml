@@ -6,13 +6,13 @@ info:
 tags:
   - name: Orders
 paths:
-  /orders/check:
+  /order/check:
     get:
       summary: Check if the service is running
       responses:
         "200":
           description: Service is running
-  /orders/new/{user_id}/{cart_id}:
+  /order/new/{user_id}/{cart_id}:
     post:
       tags:
         - Orders

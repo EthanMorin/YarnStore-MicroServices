@@ -5,6 +5,7 @@ go 1.22.2
 require (
 	github.com/getkin/kin-openapi v0.124.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/hashicorp/consul/api v1.28.2
 	github.com/oapi-codegen/gin-middleware v1.0.1
 	github.com/oapi-codegen/runtime v1.1.1

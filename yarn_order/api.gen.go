@@ -21,11 +21,11 @@ import (
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Check if the service is running
-	// (GET /orders/check)
-	GetOrdersCheck(c *gin.Context)
+	// (GET /order/check)
+	GetOrderCheck(c *gin.Context)
 	// Creates a new order
-	// (POST /orders/new/{user_id}/{cart_id})
-	PostOrdersNewUserIdCartId(c *gin.Context, userId string, cartId string)
+	// (POST /order/new/{user_id}/{cart_id})
+	PostOrderNewUserIdCartId(c *gin.Context, userId string, cartId string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -37,8 +37,8 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(c *gin.Context)
 
-// GetOrdersCheck operation middleware
-func (siw *ServerInterfaceWrapper) GetOrdersCheck(c *gin.Context) {
+// GetOrderCheck operation middleware
+func (siw *ServerInterfaceWrapper) GetOrderCheck(c *gin.Context) {
 
 	for _, middleware := range siw.HandlerMiddlewares {
 		middleware(c)
@@ -47,11 +47,11 @@ func (siw *ServerInterfaceWrapper) GetOrdersCheck(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetOrdersCheck(c)
+	siw.Handler.GetOrderCheck(c)
 }
 
-// PostOrdersNewUserIdCartId operation middleware
-func (siw *ServerInterfaceWrapper) PostOrdersNewUserIdCartId(c *gin.Context) {
+// PostOrderNewUserIdCartId operation middleware
+func (siw *ServerInterfaceWrapper) PostOrderNewUserIdCartId(c *gin.Context) {
 
 	var err error
 
@@ -80,7 +80,7 @@ func (siw *ServerInterfaceWrapper) PostOrdersNewUserIdCartId(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.PostOrdersNewUserIdCartId(c, userId, cartId)
+	siw.Handler.PostOrderNewUserIdCartId(c, userId, cartId)
 }
 
 // GinServerOptions provides options for the Gin server.
@@ -110,21 +110,21 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
-	router.GET(options.BaseURL+"/orders/check", wrapper.GetOrdersCheck)
-	router.POST(options.BaseURL+"/orders/new/:user_id/:cart_id", wrapper.PostOrdersNewUserIdCartId)
+	router.GET(options.BaseURL+"/order/check", wrapper.GetOrderCheck)
+	router.POST(options.BaseURL+"/order/new/:user_id/:cart_id", wrapper.PostOrderNewUserIdCartId)
 }
 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/5RTwY7TQAz9lZHhGDZduM0N7QH1wq6EOCBUoWHitLM0M4Pt2aqK8u9onGSBbjlwqmu/",
-	"2M/veUbwacgpYhQGOwL7Aw5Ow0QdUg0ypYwkATXtHcm30NVQzhnBAguFuIepmT9Zin2iwQlYKCV00LwE",
-	"F37GXtSmZ3T6/oheYKqpEPuk4CDHWvviKJr7OpHN+4eteWPuM8YavbvZ3GyggSckDimChVvNVIYZo8sB",
-	"LKyg7OSgi7XKnlt/QP+jJvYoqkNGchJS3HZg4QPKPPNOYQ0Qck6RZ3Hebjb1p0P2FLLMwz8hPQWPJrCh",
-	"EuO6IpdhcHQGC9rKhN7IAQ1fR6/sIp7acZFuasfFjUl9SnyF8EPihfFHPH1mpG1350i2ne5ObkBBYrBf",
-	"L2lXrFHrQv1bdYIGohuq+Kt5df+fJRB2YIUKNssFXXX1ckLl8c8J6539z4TdCztu9WRTFIyqjcv5GLyq",
-	"0z5yZTH+0e81YQ8WXrW/H0W7vIhZ//kS/95CxTWe0Al2hov3yNyX4/F8abNC2DgT8WTmfg2I21f15zYM",
-	"O52wJMdVjKU47aZfAQAA///xPQvvsQMAAA==",
+	"H4sIAAAAAAAC/5RTwY7TQAz9lZHhGDZduM0N7QH1wq6EOCBUoWHitLM0M4Pt2aqK8u9onGSBbjlwqmO/",
+	"2s/veUbwacgpYhQGOwL7Aw5Ow0QdUg0ypYwkATXtHcm30NVQzhnBAguFuIepmf+yFPtEgxOwUErooHkJ",
+	"LvyMvahNz+j0/RG9wFRTIfZJwUGOtfbFUTT3dSKb9w9b88bcZ4w1enezudlAA09IHFIEC7eaqQwzRpcD",
+	"WFhB2clBF2uVfesP6H/U7z2KypCRnIQUtx1Y+ICiI+8U1QAh5xR5lubtZlN/OmRPIcs8+hPSU/BoAhsq",
+	"Ma4LchkGR2ewoK1M6I0c0PB19MIt4qkdF92mdlysmNSkxFfoPiSe+X7E02dG2nZ3jmTb6d7kBhQkBvv1",
+	"knTFGrUt1M+qETQQ3VCFX42r2/8sgbADK1SwWa7nqqOXEyqPf05Yb+x/JuxemHGr55qiYFRpXM7H4FWc",
+	"9pEri/GPfq8Je7Dwqv39INrlNczqz1f49xaqrfGETrAzXLxH5r4cj+dLkxXCxpmIJzP3a0Dcvqo/t2HY",
+	"6YQlOa5iLMVpN/0KAAD///dcdzetAwAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

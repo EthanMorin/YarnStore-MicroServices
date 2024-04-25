@@ -26,6 +26,9 @@ type ServerInterface interface {
 	// Check if the service is running
 	// (GET /user/check)
 	GetUserCheck(c *gin.Context)
+	// Login a user
+	// (POST /user/login)
+	PostUserLogin(c *gin.Context)
 	// Delete user by ID
 	// (DELETE /user/{user_id})
 	DeleteUserUserId(c *gin.Context, userId string)
@@ -67,6 +70,19 @@ func (siw *ServerInterfaceWrapper) GetUserCheck(c *gin.Context) {
 	}
 
 	siw.Handler.GetUserCheck(c)
+}
+
+// PostUserLogin operation middleware
+func (siw *ServerInterfaceWrapper) PostUserLogin(c *gin.Context) {
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostUserLogin(c)
 }
 
 // DeleteUserUserId operation middleware
@@ -146,6 +162,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.POST(options.BaseURL+"/user", wrapper.PostUser)
 	router.GET(options.BaseURL+"/user/check", wrapper.GetUserCheck)
+	router.POST(options.BaseURL+"/user/login", wrapper.PostUserLogin)
 	router.DELETE(options.BaseURL+"/user/:user_id", wrapper.DeleteUserUserId)
 	router.GET(options.BaseURL+"/user/:user_id", wrapper.GetUserUserId)
 }
@@ -153,17 +170,17 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/7xUzW7bMAx+FYHb0Y7TrSffthYocmqBYYehKArFYhx10c8oOm0Q+N0H0Ym3Ju4OA7ZD",
-	"YIGiPn0/YvbQBBeDR88J6j2kZo1Oy/JrQsrfSCEisUWpotN2kxerQE4z1IdKAbyLCDUkJutb6Avw2mHu",
-	"PNuIOqXnQOYVzFicQOoS0qM152AFvJRtKK2LgVjIal5DDW2YueDbYJazQG0l69KQ3SJVyxR8Fck6y3aL",
-	"GV4wDsDjxux2+YQNL67lkqCjLZtgsEVf4guTLlm34kjGgxoerSmCs4wu8g76vi+A8EdnCQ3U94MZxWjW",
-	"qPZhlBvkvuGk9asgai1v8t43TV7lQNSnu4Uq1W1En1cfZ/PZHArYIiUrNC6k0hcQInodLdRwbMreCOOq",
-	"O0YbkriWA9Zsg18YqOEuJJbwBwWY+HMwu9zXBM/o5YiOcWMbOVQ9iQPHx5NX7wlXUMO76tfrqg5PqxLo",
-	"E3+YOpRCisGn4aV9mF/kj8HUkI08yBMPGkLNaLLKy/n8vGnht3pjjbI+dtnQAlLnnKYd1HAlZ5VWHp9V",
-	"N1ApBkeqZo3N9wzX4oQtNyiuXEnTGdcJGl+QtrZBZZOiznt5y6+5ZChlV4rXqNJ098Bsf5iAfrhlg4zn",
-	"BK+lnjnm38JI5KQdMlKC+n4P1sug8RqO0zmO1mkaxW9pnsxj/3Cm/vKNpAaqh6TeavKB1Sp03pzYM+iR",
-	"kNRypxbXGeZP0fx32fN/MBQTBh3M+RsPb5BfGZh3hz+u+0kcp71u0WU9o1d5I0H/0P8MAAD//3bJfFIt",
-	"BgAA",
+	"H4sIAAAAAAAC/8SVUWvbMBDHv4q47dGJ061PfttaKIFBC6MPo5SiWBdHXaTTpHPaEPzdh85J2iXuxgrr",
+	"HoyF7nT63+9O0gZqcoE8ek5QbSDVC3RahtcJY/6HSAEjW5RZdNou84DXAaGCxNH6BroCvHY4aAg6pQeK",
+	"JhvnFJ1mqJ4mi+MFbcJ4Z81xsAIeRw2NrAsUWbRpXkAFDY0d+YbMbEyxKWU8MtGuMJazRL4M0TrLdoU5",
+	"vMTYBt4bxpeze6x5ei6bkA52VJPBBv0IHznqEetGAOR4UMGdNQU5y+gCr6HrugIi/mhtRAPVTQ+j2NJ6",
+	"huB2ny7Jfv1K6+ck2VpeZts3Hb3K/NWnq6kaqcuAPo8+jifjCRSwwpisyDiRma4ACuh1sFDBzimzEcVl",
+	"u6skJaGW66nZkp8aqOCKEkut+www8Wcy6+xXk2f0skSHsLS1LCrvhcCuV/5Hi3SDFJ/4c2xRJlIgn3pV",
+	"HyYn+Wcw1dEG7vEJ4zqiZjRZx+lkcuw09Su9tEZZH1qWzVPrnI5rqOBM1iqtPD4o4ZztQrysF1h/z+Ea",
+	"HMB+gUL9TJyOtA7I+IpxZWtUNqnYer8D8UxLDqXsXPECVRr27pUtqbH+zx3xRdz+fVu8SfUnL1R/SU2D",
+	"ubivqr8gUvqw9JvtFdb10ZbIeIz5XOaziPxNjZzZqB0yxgTVzQZykfo7bnd29nfjYcLFM+6HvG6PYJy+",
+	"AKOXuj0KLzl5YjWn1psDFn0+gkLN1mp6nsP8rvffPO3JX7Xv+4hzqOBd+fREltv3sbzu690VQ4C2cF7D",
+	"8AL5F4DS7PLy3AzGcdrrBl3OZ88qGxJ0t93PAAAA//8VazlJ3QcAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

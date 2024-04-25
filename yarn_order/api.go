@@ -17,12 +17,12 @@ func NewAPI(service *OrderService) *API {
 }
 
 // GetOrdersCheck implements ServerInterface.
-func (a *API) GetOrdersCheck(c *gin.Context) {
+func (a *API) GetOrderCheck(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
 // PostOrdersNewUserIdCartId implements ServerInterface.
-func (a *API) PostOrdersNewUserIdCartId(c *gin.Context, userId string, cartId string) {
+func (a *API) PostOrderNewUserIdCartId(c *gin.Context, userId string, cartId string) {
 	var order Order
 	order.UserId = &userId
 	order.CartId = &cartId

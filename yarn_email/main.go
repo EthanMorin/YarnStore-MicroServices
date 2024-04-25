@@ -51,6 +51,7 @@ func main() {
 		for d := range msgs {
 			log.Printf("Sending email confirmation to: %s", d.Body)
 			// send email
+			SendUserEmail(string(d.Body))
 		}
 	}()
 
